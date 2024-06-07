@@ -1,0 +1,55 @@
+/*#questionObj {
+background-color: red;
+}*/
+
+#q1WObj {
+    background-color: white;
+    max-width: 1000px;
+    border-radius: 5px;
+    border: 0.5px solid gray;
+}
+
+
+#mainTWObj {
+    background-color: rgb(237,242,246);
+
+}
+
+#questionObj {
+ color: black;
+
+}
+
+#nameOfTestObj {
+    color: black;
+    font-size: 20px;
+}
+
+QWidget {
+    font-size: 15px;
+    font-family: Roboto;
+}
+
+#answerObj {
+    border-radius: 10px;
+}
+
+#submitObj {
+    color: black;
+    border-radius: 5px;
+    border: 0.5px solid gray;
+    height: 25px;
+    background-color: white;
+}
+
+
+/*QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px; // Закругляем углы
+    background-color: lightgray;
+    border: 1px solid gray;
+}
+QCheckBox::indicator:checked {
+   background-color: lightgreen; // Цвет, когда чекбокс отмечен
+}*/
