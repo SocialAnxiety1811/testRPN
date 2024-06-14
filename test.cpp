@@ -6,7 +6,7 @@ Test::Test(QWidget *parent, QString nameOfTest)
 {
     scrollArea->setWidget(mainTestWidget);
     QRect screenGeometry = QGuiApplication::screens().at(0)->geometry();
-    // this->setFixedSize(screenGeometry.width(), screenGeometry.height());
+
     this->showMaximized();
     this->setWindowFlags(Qt::Window);
 
@@ -17,7 +17,6 @@ Test::Test(QWidget *parent, QString nameOfTest)
 
     testLayout->setContentsMargins(0, 0, 0, 0);
 
-    // QString nameOfTest {testSel->currentText()};
     if (nameOfTest == "санитарка")
     {
         QLabel *nameOfTest = new QLabel(mainTestWidget);
@@ -25,16 +24,19 @@ Test::Test(QWidget *parent, QString nameOfTest)
         nameOfTest->setMaximumHeight(50);
         testLayout->addWidget(nameOfTest);
         nameOfTest->setObjectName("nameOfTestObj");
+        maxQuestions = 15;
 
         nurseTest();
     }
     else if (nameOfTest == "фельдшер-лаборант")
     {
         QLabel *nameOfTest = new QLabel(mainTestWidget);
-        nameOfTest->setText("Тесты по соблюдению требований биологической безопасностии управлениюбиорисками \nдля фельдшера-лаборанта вирусологической лаборатории");
+        nameOfTest->setText("Тесты по соблюдению требований биологической безопасностии управлению биорисками \nдля фельдшера-лаборанта вирусологической лаборатории");
         nameOfTest->setMaximumHeight(50);
         testLayout->addWidget(nameOfTest);
         nameOfTest->setObjectName("nameOfTestObj");
+        maxQuestions = 30;
+
         paramedicTest();
     }
     else if (nameOfTest == "врач-вирусолог")
@@ -44,29 +46,11 @@ Test::Test(QWidget *parent, QString nameOfTest)
         nameOfTest->setMaximumHeight(50);
         testLayout->addWidget(nameOfTest);
         nameOfTest->setObjectName("nameOfTestObj");
+        maxQuestions = 40;
+
         doctorVirologistTest();
     }
 
-    for (auto& el: questionsVec)
-    {
-        static int i{1};
-        QString iStr{QString::number(i)};
-        el->getQuestion()->setText(iStr + " " + el->getQuestion()->text());
-        i += 1;
-    }
-
-    // for (size_t i{0}; i < questionsVec.size(); ++i)
-    // {
-    //     QString iStr{QString::number(i)};
-    //     auto& el = questionsVec[i];
-    //     el. setText(iStr
-    // }
-
-    // for (auto& q: questionsVec)
-    // {
-    //     q->setFixedWidth(600);
-    //     testLayout->setAlignment(Qt::AlignHCenter);
-    // }
     testLayout->setAlignment(Qt::AlignHCenter);
 
     submit->setText("Завершить попытку");
@@ -94,7 +78,8 @@ double Test::submitTest()
             result += 1;
         }
     }
-    double testResult = (result * 100)/25;
+
+    double testResult = (result * 100)/maxQuestions;
     personalPoints = testResult;
 
     QString fio {fioInput->toPlainText()};
@@ -150,8 +135,6 @@ void Test::nurseTest()
     inputTodayData->setMaximumHeight(25);
     dataLayout->addWidget(dataInputInfo);
     dataLayout->addWidget(inputTodayData);
-
-
 
     QWidget *q1Widget = new QWidget(mainTestWidget);
     q1Widget->setFixedHeight(150);
@@ -531,21 +514,32 @@ void Test::nurseTest()
     testLayout->addWidget(q25Widget);
 
     questionsVec = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23, q24, q25};
+    questionWidgets = {q1Widget, q2Widget, q3Widget, q4Widget, q5Widget, q6Widget, q7Widget, q8Widget, q9Widget, q10Widget, q11Widget, q12Widget, q13Widget, q14Widget, q15Widget, q16Widget, q17Widget, q18Widget, q19Widget, q20Widget, q21Widget, q22Widget, q23Widget, q24Widget, q25Widget};
+    beforeShuffledW = questionWidgets;
 
-    // std::random_device rd;
-    // std::mt19937 gen(rd());
-    // std::shuffle(questionsVec.begin(), questionsVec.end(), gen);
-    // std::vector<size_t> indices(questionsVec.size());
-    // for (auto& el: questionsVec) {
-    //     el->hide();
-    //     testLayout->removeWidget(el);
-    // }
-    // for (size_t i = 0; i < 10 && !questionsVec.empty(); ++i) {
-    //     QWidget* el = questionsVec[i];
-    //     this->questionsVec.erase(questionsVec.begin() + indices[i]);
-    //     el->hide();
-    //     el->deleteLater();
-    // }
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::shuffle(questionWidgets.begin(), questionWidgets.end(), gen);
+    std::vector<size_t> indices(questionWidgets.size());
+
+    for (size_t i = 0; i < 10 && !questionWidgets.empty(); ++i)
+    {
+        QWidget* el = questionWidgets[i];
+        el->hide();
+        el->deleteLater();
+    }
+
+    int counter = 1;
+    for (auto el : beforeShuffledW)
+    {
+        if (el && !el->isHidden())
+        { // Проверка, чтобы избежать доступа к скрытым и удаленным виджетам
+            Question* q = el->findChild<Question*>();
+            QString iStr = QString::number(counter);
+            q->getQuestion()->setText(iStr + " " + q->getQuestion()->text());
+            ++counter;
+        }
+    }
 }
 
 void Test::paramedicTest()
@@ -1319,6 +1313,32 @@ void Test::paramedicTest()
     testLayout->addWidget(q50Widget);
 
     questionsVec = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23, q24, q25, q26, q27, q28, q29, q30, q31, q32, q33, q34, q35, q36, q37, q38, q39, q40, q41, q42, q43, q44, q45, q46, q47, q48, q49, q50};
+    questionWidgets = {q1Widget, q2Widget, q3Widget, q4Widget, q5Widget, q6Widget, q7Widget, q8Widget, q9Widget, q10Widget, q11Widget, q12Widget, q13Widget, q14Widget, q15Widget, q16Widget, q17Widget, q18Widget, q19Widget, q20Widget, q21Widget, q22Widget, q23Widget, q24Widget, q25Widget, q26Widget, q27Widget, q28Widget, q29Widget, q30Widget, q31Widget, q32Widget, q33Widget, q34Widget, q35Widget, q36Widget, q37Widget, q38Widget, q39Widget, q40Widget, q41Widget, q42Widget, q43Widget, q44Widget, q45Widget, q46Widget, q47Widget, q48Widget, q49Widget, q50Widget};
+    beforeShuffledW = questionWidgets;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::shuffle(questionWidgets.begin(), questionWidgets.end(), gen);
+    std::vector<size_t> indices(questionWidgets.size());
+
+    for (size_t i = 0; i < 20 && !questionWidgets.empty(); ++i)
+    {
+        QWidget* el = questionWidgets[i];
+        el->hide();
+        el->deleteLater();
+    }
+
+    int counter = 1;
+    for (auto el : beforeShuffledW)
+    {
+        if (el && !el->isHidden())
+        { // Проверка, чтобы избежать доступа к скрытым и удаленным виджетам
+            Question* q = el->findChild<Question*>();
+            QString iStr = QString::number(counter);
+            q->getQuestion()->setText(iStr + " " + q->getQuestion()->text());
+            ++counter;
+        }
+    }
 }
 
 void Test::doctorVirologistTest()
@@ -2252,4 +2272,30 @@ void Test::doctorVirologistTest()
     testLayout->addWidget(q60Widget);
 
     questionsVec = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23, q24, q25, q26, q27, q28, q29, q30, q31, q32, q33, q34, q35, q36, q37, q38, q39, q40, q41, q42, q43, q44, q45, q46, q47, q48, q49, q50, q51, q52, q53, q54, q55, q56, q57, q58, q59, q60};
+    questionWidgets = {q1Widget, q2Widget, q3Widget, q4Widget, q5Widget, q6Widget, q7Widget, q8Widget, q9Widget, q10Widget, q11Widget, q12Widget, q13Widget, q14Widget, q15Widget, q16Widget, q17Widget, q18Widget, q19Widget, q20Widget, q21Widget, q22Widget, q23Widget, q24Widget, q25Widget, q26Widget, q27Widget, q28Widget, q29Widget, q30Widget, q31Widget, q32Widget, q33Widget, q34Widget, q35Widget, q36Widget, q37Widget, q38Widget, q39Widget, q40Widget, q41Widget, q42Widget, q43Widget, q44Widget, q45Widget, q46Widget, q47Widget, q48Widget, q49Widget, q50Widget, q51Widget, q52Widget, q53Widget, q54Widget, q55Widget, q56Widget, q57Widget, q58Widget, q59Widget, q60Widget};
+    beforeShuffledW = questionWidgets;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::shuffle(questionWidgets.begin(), questionWidgets.end(), gen);
+    std::vector<size_t> indices(questionWidgets.size());
+
+    for (size_t i = 0; i < 20 && !questionWidgets.empty(); ++i)
+    {
+        QWidget* el = questionWidgets[i];
+        el->hide();
+        el->deleteLater();
+    }
+
+    int counter = 1;
+    for (auto el : beforeShuffledW)
+    {
+        if (el && !el->isHidden())
+        { // Проверка, чтобы избежать доступа к скрытым и удаленным виджетам
+            Question* q = el->findChild<Question*>();
+            QString iStr = QString::number(counter);
+            q->getQuestion()->setText(iStr + " " + q->getQuestion()->text());
+            ++counter;
+        }
+    }
 }

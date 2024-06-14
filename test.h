@@ -11,6 +11,7 @@
 #include <QVector>
 #include <QComboBox>
 #include <random>
+#include <algorithm>
 
 #include <QSqlDatabase>
 #include <QSqlTableModel>
@@ -32,6 +33,7 @@ public:
 
 private:
     QString nameOfTest;
+    double maxQuestions;
 
     QGridLayout *insideThisLayout = new QGridLayout(this);
 
@@ -48,6 +50,8 @@ private:
 
     QPushButton *submit = new QPushButton(mainTestWidget);
     QVector<Question*> questionsVec;
+    std::vector<QWidget*> questionWidgets;
+    std::vector<QWidget*> beforeShuffledW;
 
     double personalPoints{};
     QSqlQueryModel *model = new QSqlQueryModel();
